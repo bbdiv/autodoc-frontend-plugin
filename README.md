@@ -38,8 +38,8 @@ The repo is private — your own GitHub credentials (`gh auth login` or SSH) are
 # Then:
 /plugin install autodoc-frontend@autodoc-plugins
 
-# Local development / trial (no install)
-claude --plugin-dir ./autodoc-frontend-plugin
+# Local development / trial (no install; run from a clone of this repo)
+claude --plugin-dir .
 ```
 
 Note for private-repo auto-updates over HTTPS: background marketplace refresh runs without git credential helpers, so updates may fail silently — prefer SSH remotes, or run `gh auth setup-git`. Installing and manual updates work either way.
