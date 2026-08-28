@@ -41,7 +41,38 @@ Naming canon (team decisions, resolving reference divergences): `@hook/`, `@quer
 
 **Rule:** No re-export barrels. The only root `index.ts` files that exist have a JOB: QueryClient singleton, form kit factory, icons barrel, API facade. Import every other module by full path.
 
-Import grouping (manual habit, no tooling): externals → platform/DS → `@icons` → components → `@query`/`@store` → hooks → `@models` → `./styled`, groups separated by blank lines.
+### Import order (manual — no tooling enforces it; apply on every file you touch)
+
+Group order, ONE blank line between groups, alphabetical by module path inside each group, no unused imports:
+
+1. React core + ecosystem (`react`, `react-router-dom`, `react-i18next`, `@tanstack/*`)
+2. External packages (`@autodocdev/autodoc-ui`, `mf-platform-utility-module`, `antd`, `lodash`)
+3. `@icons`
+4. Internal root-alias imports — WITH SUB-GROUPS (blank line) whenever the first segment after the root alias changes: `@workforce/@form` | `@workforce/@hook/*` | `@workforce/@query/*` | `@workforce/@models/*` | `@workforce/components/*` | `@workforce/routes/*` | ... Never one solid block, even in all-internal files.
+5. Relative imports (`./`, `../`) last.
+
+```ts
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { Button, LayoutCard, Table } from '@autodocdev/autodoc-ui';
+import { useSession } from 'mf-platform-utility-module';
+
+import { MdAddCircleOutline } from '@icons';
+
+import useTypedTranslation from '@workforce/@hook/useTypedTranslation';
+
+import useGetUsers from '@workforce/@query/queries/workforce/useGetUsers';
+
+import IUsersListFilters from '@workforce/@models/user/IUsersListFilters';
+
+import MainLayout from '@workforce/components/Layout/MainLayout';
+import NavigationBar from '@workforce/components/NavigationBar';
+
+import { userListRoutes } from '@workforce/routes/buildRoute';
+
+import Header from './Header';
+```
 
 ## Layering (enforced by discipline — no lint checks it)
 
@@ -67,7 +98,7 @@ Anything only this page uses stays here; promoting single-consumer parts to `com
 
 ## `@models/` — one entity folder, one interface per file
 
-**Rule:** `@models/<entity>/<IName>.ts`, `I`-prefixed domain types (the `I` marks "business data crossing the API boundary" — applies to type aliases too), main interface default-exported, secondary shapes as named `export type`. Full-path imports, no `@models` barrel.
+**Rule:** `@models/<entity>/<IName>.ts`, `I`-prefixed domain types (the `I` marks "business data crossing the API boundary" — applies to type aliases too), main interface default-exported, secondary shapes as named `export type`. Full-path imports, no `@models` barrel. Single-interface domains may define directly in `<entity>/index.ts`; between model files use relative imports (`../companies`). Models are pure data shapes — never functions or logic.
 
 ```ts
 // @models/user/IUser.ts

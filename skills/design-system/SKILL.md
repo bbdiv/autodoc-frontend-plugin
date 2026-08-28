@@ -23,7 +23,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/enumerate-ds.mjs" .
 
 To see what changed between two versions (requires a local checkout of the `autodoc-ui` repo): `git diff v<from> v<to> -- autodoc-ui/main.tsx`. The barrel `autodoc-ui/main.tsx` is the source of truth for exports; the changelog is incomplete and out of order — never authority. Version numbers do NOT signal breaking changes (a type was renamed inside a patch range: `OptionItemType` → `PopoverOptionItemType` between 0.1.10 and 0.1.43) — only the barrel diff can.
 
-For props and usage of a specific component: the `autodoc-ui` repo carries per-export guides in `autodoc-ai-guides/<category>/<Name>.md`. They are NOT published to node_modules and they lag the code — cross-check every guide against the enumeration output before trusting it.
+For props and usage of a specific component: the `autodoc-ui` repo carries per-export guides in `autodoc-ai-guides/<category>/<Name>.md`. Some MFEs also VENDOR a copy under `.ai/context/autodoc-ai-guides/` (check the repo). Either way they are NOT published to node_modules and they lag the code — cross-check every guide against the enumeration output before trusting it.
 
 ## Decision rule: consume, extend, or create
 

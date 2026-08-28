@@ -17,8 +17,16 @@ Claude Code plugin carrying the frontend standards of Autodoc's micro-frontend p
 | `typescript-conventions` | Rigor split, envelope + type guard, literal unions, typed i18n, external `.d.ts` |
 | `hooks` | Custom-hook conventions, effect taxonomy, memoization calibration, missing react-hooks lint |
 | `tooling` | ESLint/prettier baseline, build recipe, scripts, locale codegen, CI model, testing gap |
+| `feature-workflow` | Layer order for any multi-layer change (models → API → query → forms → UI → i18n → verify) |
+| `create-list-view` | Full recipe: list page with URL filters, counters, table, empty states, cache updates |
+| `create-detail-edit-view` | Full recipe: detail/edit shell with module nav + child form routes |
+| `commit-messages` | Conventional Commits — with the CI semver mapping warning (`chore` bumps MINOR here) |
+| `grill-me` | Plan stress-test interview before non-trivial features |
+| `react-performance` | Curated Vercel react-best-practices (Next/SSR rules removed; house calibration wins) |
 
-Plus `scripts/enumerate-ds.mjs` — enumerates the installed design-system surface (used by the `design-system` skill).
+Plus `scripts/enumerate-ds.mjs` (runtime DS enumeration), `agents/pr-review` (convention-specific PR review), and `skills/data-fetching/searchcriteria-api.md` (the new workforce API contract).
+
+v0.2 incorporates the team's `.ai/` boilerplate (mf-workforce `chore/ai-boilerplate` branch): feature workflows, the searchCriteria filter system, newer query/mutation conventions, and operational detail for icons/imports/translations. Mapping and open conflicts: `extracao/findings/06-v02-mapeamento.md` in the extraction workspace.
 
 ## Installation
 

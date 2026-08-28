@@ -45,9 +45,21 @@ Naming is standardized: `get<X>Key` / `get<X>Configs` (team decision — the ref
 
 **Rule:** Gate on required params: `enabled: Boolean(customerId)`, `!!customerId && !!userId`, `userId !== 'new'` (the create/edit shared-route sentinel). Session ids arrive asynchronously — without the guard the query fires with empty ids.
 
-## staleTime
+## staleTime & list options
 
-**Rule:** `staleTime: (query) => (query.state.dataUpdateCount === 0 ? 0 : 1000 * 60 * N)` — always fresh on first load of a session, cached N minutes on revisits. Pick N deliberately (10 for lists is typical) and make the comment match the value. Near-immutable data (CBO catalogs) may use a static staleTime.
+**Rule:** Two staleTime patterns, chosen by data kind:
+- **Dynamic** — `staleTime: (query) => (query.state.dataUpdateCount === 0 ? 0 : 1000 * 60 * N)` — fresh on first load, cached N minutes on revisits. For detail pages and volatile lists; make the comment match N.
+- **Static** — `staleTime: 5 * 60 * 1000` — for reference data (profiles, access levels, catalogs).
+
+**Rule:** Paginated lists add `placeholderData: keepPreviousData` (avoids the empty-flash between pages). Lookups where retrying doesn't help (search-by-email, CEP) set `retry: 0`.
+
+**Optional:** a configs builder may take a trailing `configs?` param spread last, so call sites can override options without a new module.
+
+## Which filter system? (check before writing API code)
+
+Two coexist during the backend migration:
+- **Legacy** (most repos): `IFilter` + `genFilters` → `filter[field]=op:value` query strings; keys via `genKeyFromFilter`.
+- **searchCriteria** (migration target; implemented in mf-workforce's develop line): `filtersGroup` URL shape → `ISearchCriteria` → `searchCriteria[...]` query strings; keys via `genKeyFromFilterLaravel`; response pagination in `meta.total`. Full contract and recipe: [searchcriteria-api.md](searchcriteria-api.md).
 
 ## One QueryClient
 
@@ -87,7 +99,7 @@ Type loader data at the read site: `useLoaderData<IUsersListLoader>()` (team dec
 
 ## Mutations
 
-**Rule:** One mutation per file in `@query/mutation/<entity>/use<Verb><Entity>.ts` — a THIN wrapper: `(customerId, { onSuccess, onError })`, kebab-case `mutationKey`, typed `mutationFn` delegating to the API layer, callbacks passed through. All UI effects live at the CALL SITE.
+**Rule:** One mutation per file in `@query/mutation/<entity>/use<Verb><Entity>Mutation.ts` — a THIN wrapper: context params first (`customerId`), typed callbacks object last (`interface Use<Hook>Props { onSuccess: (data: T) => void; onError: (error: unknown) => void; }`), kebab-case `mutationKey` (add dynamic ids when uniqueness matters: `['select-customer', userId]`), typed `mutationFn` delegating to the API layer and returning `res.data`, callbacks passed through. All UI effects live at the CALL SITE.
 
 **Rule:** In the call-site `onSuccess`: named notification function + `queryClient.invalidateQueries({ queryKey: get<X>Key(customerId) })` (the exported key builder — prefix match invalidates every filtered variant) + navigation. Include the mutation's `isPending` in button-disable expressions.
 
@@ -133,6 +145,30 @@ For per-user data that gates the whole app (rights/profile), wrap the queryFn in
 
 Do NOT use `@tanstack/react-query-persist-client` / `PersistQueryClientProvider` — installed in one reference but never imported; the codebase's persistence is the hand-rolled per-query persistor.
 
+## Optimistic updates (when instant feedback is required)
+
+**Rule:** Snapshot-based, never blind-revert. `onMutate` saves the previous data and returns it as context; `onError` restores FROM THE CONTEXT:
+
+```ts
+onMutate: ({ customerInfo }) => {
+  const originalData = queryClient.getQueryData(getMySessionKey(userId));
+  queryClient.setQueryData(getMySessionKey(userId), (old) => ({ ...old, selected_customer: customerInfo }));
+  return { originalData };
+},
+onError: (error, _vars, context) => {
+  queryClient.setQueryData(getMySessionKey(userId), context?.originalData);
+  onError?.(error);
+},
+```
+
+**Rule:** To update a row across EVERY cached filter combination of a list, use a partial-key match:
+```ts
+queryClient.setQueriesData<IApiReturn<IEntity[]>>({ queryKey: ['entities'] }, (old) =>
+  old ? { ...old, data: old.data.map((i) => (i.id === updated.id ? { ...i, ...updated } : i)) } : old,
+);
+```
+Default remains call-site invalidation; optimistic writes are for toggles that must feel instant.
+
 ## Not practiced here (don't introduce without a decision)
 
-`useInfiniteQuery` (pagination is URL+server-side, capped at 50/page), `useSuspenseQuery`, `useQueries`, global QueryCache handlers, `select`/`placeholderData`, AbortSignal cancellation, optimistic updates (one legacy occurrence exists with a broken blind revert — recognize, don't copy).
+`useInfiniteQuery` (pagination is URL+server-side, capped at 50/page), `useSuspenseQuery`, `useQueries`, global QueryCache handlers, `select`, AbortSignal cancellation.

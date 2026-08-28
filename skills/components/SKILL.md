@@ -98,7 +98,11 @@ const ListOption = ({ showDivider = false, ...props }: ListOptionProps) => (
 
 ## Icons
 
-**Rule:** All icons via the `@icons` barrel (per-icon ESM named imports from `react-icons/<set>`, re-exported from `@icons/index.ts`; the alias is a FILE alias). Explicit numeric `size`: 16 inline (buttons, cells, menus, labels), 24 for modal-title warnings and notifications, 48+ only for illustrations/spinners. Custom SVG icons replicate the react-icons signature (`{ size = 20, color, className }` → `<svg height/width={size} fill={color}>`) so they're drop-in interchangeable.
+**Rule:** All icons via the `@icons` barrel — NEVER import `react-icons/*` in views/components/utils (only the barrel itself does). To add one: pick it on react-icons.github.io/react-icons/search, import it in `@icons/index.ts` from the correct subpath, add it to the export block, keep the library's export name (no local aliases).
+
+**Rule:** Custom icons that don't exist in react-icons live in `@icons/extraIcons/<Name>.tsx`, replicate the react-icons signature (`{ size = 20, color, className }` → `<svg height/width={size} fill={color}>`) so they're drop-in interchangeable, and are re-exported from the barrel.
+
+**Rule:** Explicit numeric `size`: 16 inline (buttons, cells, menus, labels), 24 for modal-title warnings and notifications, 48+ only for illustrations/spinners.
 
 ## Accessibility
 

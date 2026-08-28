@@ -7,7 +7,9 @@ description: React hook conventions for Autodoc MFEs - where custom hooks live, 
 
 ## Custom hooks: tiny, shared-infrastructure-only surface
 
-**Rule:** Reusable hooks live in `src/@hook/`, one hook per file named after it, default export; a folder (with `index.ts`) only when it carries companions (`useUrlSearchParameters/` has `utils.ts`). **No view or component defines a local `use*`** — page logic is either inline or promoted to shared infra, nothing in between. (The references hold 4 and 3 hooks total; the legacy repo hoards 19 generic ones — don't import that habit: no `useDebounce`, `useWindowSize`, `useOutsideClick` utilities here.)
+**Rule:** Reusable hooks live in `src/@hook/`, one hook per file named after it, default export; a folder (with `index.ts`) only when it carries companions (`useUrlSearchParameters/` has `utils.ts`). A hook relevant to a SINGLE view may be colocated (`src/views/<Feature>/hooks/`) — but prefer inline logic until it repeats; never hoard generic utility hooks (the legacy repo's 19 `useDebounce`/`useWindowSize`/`useOutsideClick` are the antipattern).
+
+**Rule:** Non-trivial hooks declare explicit `Args` and `Return` types; effects inside hooks always clean up (listeners, timers, subscriptions, observers); a hook should NOT exist for one-off logic or anything that's clearer as a plain function.
 
 **Rule:** Hooks return named-field OBJECTS, never tuples: `return { searchParams, updateSearchParams }`.
 

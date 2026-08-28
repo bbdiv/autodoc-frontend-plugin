@@ -58,7 +58,11 @@ The boundary is *who acts on it*: toasts report an action's outcome; helperText 
 
 **Rule:** Gate on settle: `isFetched && !isLoading && data.length === 0` — `isFetched` prevents flashing before the first response; `?? []` keeps the Table alive when the query errored.
 
-**Rule (completes what the reference left unfinished):** the discrimination MUST also branch on whether any filters are active (read `searchParams`): filters active → filtered-empty; none → true-empty. The reference components and copy exist but its guard never checks filters — implement the check.
+**Rule:** the discrimination MUST also branch on whether any filters are active: filters active → filtered-empty; none → true-empty. Where the repo's `useUrlSearchContext` exposes `filtersCount` (mf-workforce develop line), use it directly:
+```tsx
+{isFetched && !isLoading && data?.data.length === 0 && filtersCount === 0 ? <NoEntity /> : ...}
+```
+Elsewhere derive it from `searchParams`. (Frozen main shipped the components without this check — never copy the length-only guard.)
 
 Gate the empty state's CTA by the same permission as the header CTA (a reference `NoUsers` shows a create button the header hides — inconsistency, don't copy).
 

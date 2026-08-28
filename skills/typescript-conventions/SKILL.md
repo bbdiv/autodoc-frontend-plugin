@@ -48,7 +48,14 @@ Narrow ONLY with the predicate — never ad-hoc property checks. QueryFns normal
 3. `DotNestedKeys<T>` (recursive template-literal type) flattens it to `'A' | 'A.B' | ...`;
 4. the hook re-types `t: (key: dottedTranslationsKeys, opts?: Record<string, string | number>) => string`.
 
-A typo'd or missing key is a compile error. Never escape with `t(key as any)` for dynamic keys — restructure the keys instead. Outside components use `translateString` (the non-hook `t`). Forgetting step 2 means new keys type-error at the call site — that's the workflow working.
+A typo'd or missing key is a compile error. Never escape with `t(key as any)` for dynamic keys — restructure the keys instead. Outside components use `translateString` (the non-hook `t`).
+
+**Operational rules when adding a key:**
+- Update FOUR files together: the pt locale JSON + `en` + `es` + `translationsKeyType.ts` (via the script, or by careful manual edit mirroring the JSON shape — both practiced; keep keys alphabetical within each nesting level).
+- **Any user-facing text handed to you in a task is source content for a NEW key** — never inline it in components/modals/notifications unless explicitly asked.
+- Interpolation: `{{VARIABLE}}` in the JSON value, `t('KEY', { VARIABLE: x })` at the call.
+- Plurals: i18next `_other` suffix — both `KEY` and `KEY_other` must exist in JSON AND the type.
+- A key in the type but missing from a JSON silently falls back to the key string at runtime — the type only guards existence in the source locale.
 
 ## Externals get hand-written `.d.ts`
 

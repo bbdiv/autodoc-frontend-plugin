@@ -42,6 +42,18 @@ return (
 );
 ```
 
+## Adding a field — the priority ladder
+
+**A.** Use an existing registered field component (`field.TextField`, `field.SelectField`, ...).
+**B.** Create a NEW registered field component when the need is reusable: follow the field contract above, wrap a DS primitive, register it in `@form/index.ts` `fieldComponents`.
+**C.** Use a component inline inside `AppField` `children` only when the field is one-off/too specific:
+```tsx
+<formInstance.AppField name="projects" children={(field) => (
+  <TreeSelect value={field.state.value} onChange={field.handleChange} data={groups ?? []} />
+)} />
+```
+Never skip straight to C when the need will recur.
+
 ## Validation
 
 **Rule:** Field-level validators as the trio `validators={{ onMount, onChange, onSubmit }}` using shared helpers from `@form/helpers.ts` (`emptyFieldStringValidation`, `isValidEmail` — return a message from `@form/errorTexts.ts` or `undefined`). Pass helpers as bare references (team decision). `onMount` makes required-empty fields count against `canSubmit` from first render, so the save button starts disabled.
