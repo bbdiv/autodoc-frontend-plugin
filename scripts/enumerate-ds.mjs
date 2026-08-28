@@ -10,7 +10,14 @@
  *
  * Why this exists: every MFE pins a different exact version of the design
  * system and the lib keeps moving. Any static component list is born stale.
- * The ONLY trustworthy inventory is the installed package's own type entry.
+ * The ONLY trustworthy inventory is what the installed package itself carries.
+ *
+ * Source priority:
+ *   1. dist/manifest.json — emitted by autodoc-ui builds that run
+ *      scripts/generate-manifest.mjs (carries values/types/deprecated).
+ *      Older published versions (0.1.x, <=0.2.12) do NOT have it.
+ *   2. the types entry (dist/main.d.ts), following `export *` chains.
+ *   3. the ESM main entry (dist/main.js).
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -145,15 +152,40 @@ const mainEntry = installedPkg.main ?? 'dist/main.js';
 
 let source = null;
 let parsed = null;
+let deprecated = null;
+const warnings = [];
+
+// --- Preferred: the build-time manifest (newer autodoc-ui versions) --------
+const manifestPath = join(installedDir, 'dist', 'manifest.json');
+if (existsSync(manifestPath)) {
+  try {
+    const m = readJson(manifestPath);
+    if (Array.isArray(m.values) && m.values.length > 0) {
+      parsed = {
+        values: [...m.values].sort(),
+        types: Array.isArray(m.types) ? [...m.types].sort() : null,
+      };
+      deprecated = Array.isArray(m.deprecated) ? [...m.deprecated].sort() : [];
+      source = 'dist/manifest.json';
+      if (m.version && m.version !== version) {
+        warnings.push(
+          `manifest.json says ${m.version} but package.json says ${version} — stale manifest inside the package; trust package.json and consider re-verifying.`,
+        );
+      }
+    }
+  } catch {
+    // Malformed manifest: fall through to the parser chain below.
+  }
+}
 
 const typesPath = join(installedDir, typesEntry);
-if (existsSync(typesPath)) {
+if (!parsed && existsSync(typesPath)) {
   const collected = collectExports(typesPath);
   parsed = { values: [...collected.values].sort(), types: [...collected.types].sort() };
   source = typesEntry;
 }
 
-if (!parsed || (parsed.values.length === 0 && parsed.types.length === 0)) {
+if (!parsed || (parsed.values.length === 0 && !(parsed.types?.length > 0))) {
   // Fallback 1: the ESM main file also carries `export { ... }` statements.
   const mainPath = join(installedDir, mainEntry);
   if (existsSync(mainPath)) {
@@ -172,7 +204,6 @@ if (!parsed || (parsed.values.length === 0 && !(parsed.types?.length > 0))) {
 }
 
 // --- 4. Output ------------------------------------------------------------
-const warnings = [];
 if (declared && declared !== version) {
   warnings.push(
     `Declared version (${declared}) differs from installed (${version}) — stale install; run install and re-enumerate.`,
@@ -188,6 +219,7 @@ process.stdout.write(
       source,
       values: parsed.values,
       types: parsed.types,
+      deprecated, // array when the manifest provides it; null when enumerated by parsing
       warnings,
     },
     null,
