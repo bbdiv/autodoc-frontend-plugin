@@ -1,0 +1,17 @@
+{
+  "name": "autodoc-frontend",
+  "displayName": "Autodoc Frontend Standards",
+  "description": "Frontend patterns for Autodoc micro frontends, extracted from the reference repos mf-workforce and mf-adm: design-system consumption (runtime enumeration, never assume a component exists), TanStack Query data fetching with router-loader prefetch, TanStack Form kit, state ownership, single-spa platform contract, and code conventions.",
+  "version": "0.1.0",
+  "author": { "name": "Autodoc Frontend" },
+  "license": "UNLICENSED",
+  "keywords": [
+    "autodoc",
+    "react",
+    "micro-frontend",
+    "single-spa",
+    "tanstack-query",
+    "tanstack-form",
+    "design-system"
+  ]
+}

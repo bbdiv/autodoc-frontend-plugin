@@ -1,0 +1,14 @@
+{
+  "name": "autodoc-plugins",
+  "owner": { "name": "Autodoc Frontend" },
+  "description": "Claude Code plugins for Autodoc frontend development.",
+  "plugins": [
+    {
+      "name": "autodoc-frontend",
+      "source": "./",
+      "description": "Frontend standards extracted from mf-workforce and mf-adm: design-system consumption with runtime enumeration, TanStack Query/Form patterns, state ownership, single-spa platform contract, and code conventions.",
+      "category": "development",
+      "keywords": ["autodoc", "react", "micro-frontend", "design-system"]
+    }
+  ]
+}
