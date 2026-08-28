@@ -99,7 +99,7 @@ Type loader data at the read site: `useLoaderData<IUsersListLoader>()` (team dec
 
 ## Mutations
 
-**Rule:** One mutation per file in `@query/mutation/<entity>/use<Verb><Entity>Mutation.ts` — a THIN wrapper: context params first (`customerId`), typed callbacks object last (`interface Use<Hook>Props { onSuccess: (data: T) => void; onError: (error: unknown) => void; }`), kebab-case `mutationKey` (add dynamic ids when uniqueness matters: `['select-customer', userId]`), typed `mutationFn` delegating to the API layer and returning `res.data`, callbacks passed through. All UI effects live at the CALL SITE.
+**Rule:** One mutation per file in `@query/mutation/<entity>/use<Verb><Entity>Mutation.ts` — a THIN wrapper: context params first (`customerId`), typed callbacks object last (`interface IUse<Hook>Props { onSuccess: (data: T) => void; onError: (error: unknown) => void; }`), kebab-case `mutationKey` (add dynamic ids when uniqueness matters: `['select-customer', userId]`), typed `mutationFn` delegating to the API layer and returning `res.data`, callbacks passed through. All UI effects live at the CALL SITE.
 
 **Rule:** In the call-site `onSuccess`: named notification function + `queryClient.invalidateQueries({ queryKey: get<X>Key(customerId) })` (the exported key builder — prefix match invalidates every filtered variant) + navigation. Include the mutation's `isPending` in button-disable expressions.
 

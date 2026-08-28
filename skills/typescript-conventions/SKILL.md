@@ -14,7 +14,7 @@ Both tsconfigs: `strict: true` **with** `noImplicitAny: false`. The practiced me
 
 ## Domain models
 
-**Rule:** `I` prefix marks domain/entity types (`IUser`, `IFilter`, `IApiReturn`) — including type aliases (`type IModules = 'workforce' | ...`). Component props are `<Name>Props` without `I`. One entity file under `@models/<entity>/`, main interface default-exported (see `project-structure`).
+**Rule:** `I` prefix on ALL interfaces and type aliases — domain models (`IUser`, `IFilter`, `IApiReturn`, `type IModules = ...`) AND component props (`INavigationBarProps`) AND hook props (`IUseCreateUserMutationProps`). Team decision 2026-08-28. One entity file under `@models/<entity>/`, main interface default-exported (see `project-structure`).
 
 **Rule:** Status/lifecycle fields = inline string-literal unions: `status: 'active' | 'inactive' | 'draft'`. Never enums (team decision), never `'active' | 'inactive' | string` (the `| string` absorbs the literals and kills narrowing — real defect in a reference model, don't copy).
 

@@ -106,7 +106,7 @@ export default IUser;
 export type { IUserInfo, IActionMeta, IUserAccessLevel };
 ```
 
-Component props interfaces are `<Name>Props` WITHOUT the `I` (team decision — reserve `I` for domain models).
+Component props interfaces also take the `I` prefix: `I<Name>Props` (team decision 2026-08-28 — `I` on everything).
 
 ## `routes/` — five-part skeleton
 

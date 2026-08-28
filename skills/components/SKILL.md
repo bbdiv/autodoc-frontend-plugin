@@ -7,7 +7,7 @@ description: Component-writing conventions for Autodoc MFEs - declaration style,
 
 ## Declaration & props
 
-**Rule:** `const Name = ({ ...props }: NameProps) => {...}` + `export default Name` at file end. Props interface `<Name>Props` (no `I` prefix — reserve `I` for domain models) declared in the same file directly above; defaults in the destructure, never `defaultProps`. `React.FC` only for prop-less roots and custom SVG icons.
+**Rule:** `const Name = ({ ...props }: INameProps) => {...}` + `export default Name` at file end. Props interface `I<Name>Props` (the `I` prefix applies to everything — team decision) declared in the same file directly above; defaults in the destructure, never `defaultProps`. `React.FC` only for prop-less roots and custom SVG icons.
 
 **Rule:** Pluggable regions (title, right-side actions, icon slots) typed `React.ReactNode` and rendered directly — no render-prop functions for slots:
 ```tsx
