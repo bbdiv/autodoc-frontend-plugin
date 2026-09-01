@@ -5,6 +5,8 @@ description: State ownership rules for Autodoc MFEs - what goes in the TanStack 
 
 # State ownership
 
+**Step 0:** The zustand rows below assume `zustand` is in the target repo's `package.json`. Absent → report it and ask before creating any store; never install it on your own. (The URL/useState/PUM rows need no lib.)
+
 Every kind of state has exactly one owner. Placing it elsewhere is the #1 habit to unlearn from the legacy (redux-saga) repos.
 
 | Kind of state | Owner | Never |

@@ -5,6 +5,8 @@ description: TanStack Form v1 patterns for Autodoc MFEs - the app form kit (crea
 
 # Forms (TanStack Form v1)
 
+**Step 0:** Confirm `@tanstack/react-form` is in the target repo's `package.json` before writing any of this. Absent → report it and ask; never install it or scaffold the kit on your own.
+
 ## The form kit — one per MFE
 
 **Rule:** `src/@form/index.ts` creates the kit ONCE: `createFormHookContexts()` + `createFormHook({ fieldComponents })`, registering the app's DS-wrapping field components. All forms consume `useAppForm` / `withForm` from here — never raw `useForm`.

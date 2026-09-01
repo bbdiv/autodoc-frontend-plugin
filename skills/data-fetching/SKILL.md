@@ -5,6 +5,8 @@ description: TanStack Query 5 patterns for Autodoc MFEs - query module triple ex
 
 # Data fetching (TanStack Query 5 + react-router loaders)
 
+**Step 0:** Confirm `@tanstack/react-query` is in the target repo's `package.json` before writing any of this. Absent → report it and ask; never install it or scaffold the pattern on your own.
+
 Server data lives ONLY in the TanStack Query cache. Never mirror it into `useState` or zustand (see `state-management` skill for the one narrow exception). Never fetch in `useEffect`.
 
 ## The query module: triple export, one file per query
